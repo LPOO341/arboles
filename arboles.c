@@ -9,7 +9,6 @@ struct BinaryTreeNode {
 };
 
 struct Queue{
-  int front, rear, size;
   struct BinaryTreeNode *node;
   struct Queue *next;
 };
@@ -37,6 +36,13 @@ TreeNodePtr Pop(struct Stack *S);
 TreeNodePtr Top(struct Stack *S);
 int IsEmptyStack(struct Stack *stack);
 void DeleteStack(struct Stack *S);
+struct Queue *CreateQueue();
+void Enqueue(struct Queue *Q, TreeNodePtr node);
+TreeNodePtr Dequeue(struct Queue *Q);
+int IsEmptyQueue(struct Queue *Q);
+void DeleteQueue(struct Queue *Q);
+
+
 
 
 int main()
@@ -50,21 +56,23 @@ int main()
     insertNode(&rootPtr, item);   
   }
   // traverse the tree preOrder
-  puts("\n\nThe preOrder traversal is:");
+  puts("\n\nThe preOrder traversal recursive is:");
   preOrder(rootPtr);
-  puts("\n\nThe preOrder traversal 2 is:");
+  puts("\n\nThe preOrder traversal no recursive is:");
   PreOrderNonRecursive(rootPtr);
   // traverse the tree inOrder
-  puts("\n\nThe inOrder traversal is:");
+  puts("\n\nThe inOrder traversal recursive is:");
   inOrder(rootPtr);
-  puts("\n\nThe inOrder traversal 2 is:");
+  puts("\n\nThe inOrder traversal no recursive is:");
   InOrderNonRecursive(rootPtr);
   // traverse the tree postOrder
-  puts("\n\nThe postOrder traversal is:");
+  puts("\n\nThe postOrder traversal recursive is:");
   postOrder(rootPtr);
-  puts("\n\nThe postOrder traversal 2 is:");
+  puts("\n\nThe postOrder traversal no recursive is:");
   PostOrderNonRecursive(rootPtr);
-
+  // traverse the tree levelOrder
+  puts("\n\nThe levelOrder traversal is:");
+  LevelOrder(rootPtr);
   return 0;
 }
 
@@ -174,21 +182,21 @@ void PostOrderNonRecursive(TreeNodePtr treePtr){
   DeleteStack(S);
 }
 
-// void LevelOrder(TreeNodePtr treePtr){
-//   struct Queue *Q = CreateQueue();
-//   if(treePtr == NULL)
-//     return;
-//   Enqueue(Q, treePtr);
-//   while(!IsEmptyQueue(Q)){
-//     treePtr = Dequeue(Q);
-//     printf("%3d", treePtr->data);
-//     if(treePtr->left)
-//       Enqueue(Q, treePtr->left);
-//     if(treePtr->right)
-//       Enqueue(Q, treePtr->right);
-//   }
-//   DeleteQueue(Q);
-// }
+void LevelOrder(TreeNodePtr treePtr){
+  struct Queue *Q = CreateQueue();
+  if(treePtr == NULL)
+    return;
+  Enqueue(Q, treePtr);
+  while(!IsEmptyQueue(Q)){
+    treePtr = Dequeue(Q);
+    printf("%3d", treePtr->data);
+    if(treePtr->left)
+      Enqueue(Q, treePtr->left);
+    if(treePtr->right)
+      Enqueue(Q, treePtr->right);
+  }
+  DeleteQueue(Q);
+}
 
 struct Stack *CreateStack(){
   struct Stack *S = (struct Stack *)malloc(sizeof(struct Stack));
@@ -228,36 +236,40 @@ void DeleteStack(struct Stack *S){
   }
 }
 
+struct Queue *CreateQueue(){
+  struct Queue *temp = (struct Queue *)malloc(sizeof(struct Queue));
+  temp->node = NULL;
+  temp->next = NULL;
+  return temp;
+}
 
+void Enqueue(struct Queue *Q, TreeNodePtr node){
+  struct Queue *temp = (struct Queue *)malloc(sizeof(struct Queue));
+  temp->node = node;
+  temp->next = NULL;
+  while(Q->next)
+    Q = Q->next;
+  Q->next = temp;
+}
 
+TreeNodePtr Dequeue(struct Queue *Q){
+  struct Queue *temp = Q->next;
+  TreeNodePtr node = temp->node;
+  Q->next = temp->next;
+  free(temp);
+  return node;
+}
 
-// struct Queue *CreateQueue(){
-//   struct Queue *Q = (struct Queue *)malloc(sizeof(struct Queue));
-//   Q->front = Q->rear = NULL;
-//   return Q;
-// }
+int IsEmptyQueue(struct Queue *Q){
+  return Q->next == NULL;
+}
 
-// void Enqueue(struct Queue *Q, TreeNodePtr node){
-//   struct Queue *temp = (struct Queue*)malloc(sizeof(struct Queue));
-//   temp->node = node;
-//   temp->next = NULL;
-//   if(Q->rear == NULL){
-//     Q->front = Q->rear = temp;
-//     return;
-//   }
-//   Q->rear->next = temp;
-//   Q->rear = temp;
-// }
-
-// TreeNodePtr Dequeue(struct Queue *Q){
-//   if(Q->front == NULL)
-//     return NULL;
-//   struct Queue *temp = Q->front;
-//   TreeNodePtr node = temp->node;
-//   Q->front = temp->next;
-//   if(Q->front == NULL)
-//     Q->rear = NULL;
-//   free(temp);
-//   return node;
-// }
+void DeleteQueue(struct Queue *Q){
+  struct Queue *temp;
+  while(Q){
+    temp = Q;
+    Q = Q->next;
+    free(temp);
+  }
+}
 
